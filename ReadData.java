@@ -58,11 +58,20 @@ public class ReadData{
     //return an array with two values -- standard deviation 
     //for the x column and y column
     public double[] stdDeviation(double[][] xy){
-        double sum = 0;
-        double[] mean = ...
-        ...
-        return 
+        //double sum = 0;
+        double[] mean = mean(xy);
+        double[] stdev = new double[2];
+       
+        for(int j = 0; j < xy[0].length; j++){
+            double num = 0;
+            for(int i = 0; i < xy.length; i++)
+                num += Math.pow(xy[i][j] - mean[j], 2);
+            stdev[j] = Math.sqrt(num/(xy.length - 1));
+        }
+       
+        return stdev;
     }
+    
     
     //this returns the mean of each columns of data passed in
     //the mean is the sum of the values divided by the number 
@@ -70,8 +79,13 @@ public class ReadData{
     public double[] mean(double[][] xy){
         double sum1 = 0;
         double sum2 = 0;
-        double[] mean = new double[data.length];
-
+        double[] mean= new double[2];
+        for(int i = 0; i < xy.length; i++){
+            sum1 += xy[i][0];
+            sum2 += xy[i][1];
+        }
+        mean[0] = sum1 / xy.length;
+        mean[1] = sum2 / xy.length;
         return mean;
     }
 
@@ -79,11 +93,15 @@ public class ReadData{
     //the standard units are the value minus the mean divided by the standard deviation
     //this should return a double 2D array of the standard units
     public double[][] standardUnits(double[][] xy){
-        double[][] stdArr = ...
-        double[] stdDeviation = ...;
-        double[] mean = ...;
-        ...
-        return stdArr;
+        double[][] std = new double[xy.length][2];
+        double[] stdDeviation = stdDeviation(xy);
+        double[] mean = mean(xy);
+            for(int i = 0; i < xy.length; i++){
+                std[i][0] = (xy[i][0] - mean[0]) / stdDeviation[0];
+                std[i][1] = (xy[i][1] - mean[1]) / stdDeviation[1];
+            }
+   
+        return std;
     }
     
     //this returns the correlation between the two columns of data passed in
@@ -95,23 +113,22 @@ public class ReadData{
     //the correlation is between -1 and 1
     public double correlation(double[][] xy){
         double sum = 0;
-        ...
-        return ...;    
+        double[][] x = standardUnits(xy);
+        for(int i = 0; i < xy.length; i++)
+            sum += x[i][0] * x[i][1];
+        return sum/ (xy.length - 1);    
     }
     
     public void runRegression(){
-        // double[][] xy = getColumns(7,9);
-        // double[][] xyStd = standardUnits(xy);
-        // double correlation = correlation(xyStd);
-        double[] xyStandDev = stdDeviation(xyStd);
-        // double slope = correlation * xyStd[1] / xyStd[0];
-        // double[] means = mean(xy)
-        // double intercept = means[1] - slope * means[0];
-        // System.out.println("Correlation: " + correlation);
-        // System.out.println("Slope: " + slope);
-        // System.out.println("Intercept: " + intercept);
-        // Scatter s = new Scatter();
-        // s.displayScatterPlot(xy[0], xy[1]);
+        double[][] xy = getColumns(7,9);
+        double correlation = correlation(xy);
+        double slope = correlation * (stdDeviation(xy)[1] / stdDeviation(xy)[0]);
+        double[] means = mean(xy);
+        double intercept = means[1] - slope * means[0];
+        System.out.println("Correlation: " + correlation);
+        System.out.println("Slope: " + slope);
+        System.out.println("Intercept: " + intercept);
+
     }
 
     //this prints the array passed in - you may want this for debugging
